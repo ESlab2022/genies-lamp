@@ -1,0 +1,25 @@
+version: "3.9"
+services:
+  grafana:
+    image: grafana/grafana:latest
+    restart: unless-stopped
+    volumes:
+      - ./data/grafana/data:/var/lib/grafana
+      - ./data/grafana/provisioning:/etc/grafana/provisioning
+    environment:
+      - GF_SECURITY_ADMIN_USER=$GF_ADMIN
+      - GF_SECURITY_ADMIN_PASSWORD=$GF_ADMIN_PASS
+      - GF_USERS_ALLOW_SIGN_UP=false
+    ports:
+      - "192.168.10.102:3000:3000"
+    links:
+      - "mqtt:mqtt"
+
+  mqtt:
+    image: eclipse-mosquitto
+    volumes:
+      - ./conf/mqtt/mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - ./data/mqtt/data:/mosquitto/data
+      - ./log/mqtt/mosquitto.log:/mosquitto/log/mosquitto.log
+    ports:
+      - "192.168.10.102:1883:1883"
