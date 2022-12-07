@@ -4,12 +4,14 @@ import psycopg2
 import paho.mqtt.client as mqtt
 from dotenv import dotenv_values
 
+env = dotenv_values("../.env")
+
 conn = psycopg2.connect(
-    host="localhost",
-    database="postgres",
-    user="postgres",
-    password="postgres",
-    port="5432",
+    host=env["POSTGRES_HOST"],
+    port=env["POSTGRES_PORT"],
+    database=env["POSTGRES_DB"],
+    user=env["POSTGRES_USER"],
+    password=env["POSTGRES_PASS"],
 )
 
 
@@ -56,8 +58,5 @@ if __name__ == "__main__":
         """
     )
     conn.commit()
-
-    env = dotenv_values("../.env")
     main(env)
-
     conn.close()
