@@ -1,0 +1,9 @@
+{
+  "devices": 2,
+  "tables": {
+    "temperature": "FLOAT",
+    "humidity": "FLOAT",
+    "pressure": "FLOAT",
+    "emergency": "BOOL"
+  }
+}

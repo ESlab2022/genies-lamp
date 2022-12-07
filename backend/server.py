@@ -8,11 +8,11 @@ app = Flask("app")
 def turnOn():
     data = request.json
     # single number
-    lampID = data.get("lampID")
-    if lampID == None:
+    deviceID = data.get("deviceID")
+    if deviceID == None:
         return "ERROR"
-    print(f"turning on lamp {lampID}")
-    publish(topic=f"/lamp{lampID}/brightness", payload=100)
+    print(f"turning on lamp {deviceID}")
+    publish(topic=f"/lamp{deviceID}/brightness", payload=100)
     return "OK"
 
 # handle post request on /turnOff
@@ -20,11 +20,11 @@ def turnOn():
 def turnOff():
     data = request.json
     # single number
-    lampID = data.get("lampID")
-    if lampID == None:
+    deviceID = data.get("deviceID")
+    if deviceID == None:
         return "ERROR"
-    print(f"turning off lamp {lampID}")
-    publish(topic=f"/lamp{lampID}/brightness", payload=0)
+    print(f"turning off lamp {deviceID}")
+    publish(topic=f"/lamp{deviceID}/brightness", payload=0)
     return "OK"
 
 # handle post request on /setBrightness
@@ -32,11 +32,11 @@ def turnOff():
 def setBrightness():
     data = request.json
     # single number
-    lampID = data.get("lampID")
+    deviceID = data.get("deviceID")
     # 0 - 100
     brightness = data.get("brightness")
-    if lampID == None or brightness == None:
+    if deviceID == None or brightness == None:
         return "ERROR"
-    print(f"setting brightness of lamp {lampID} to {brightness}")
-    publish(topic=f"/lamp{lampID}/brightness", payload=brightness)
+    print(f"setting brightness of lamp {deviceID} to {brightness}")
+    publish(topic=f"/lamp{deviceID}/brightness", payload=brightness)
     return "OK"

@@ -1,10 +1,13 @@
 import time
+import os
 
 import psycopg2
 import paho.mqtt.client as mqtt
 from dotenv import dotenv_values
 
-env = dotenv_values("../.env")
+ENV_PATH = os.path.join(os.path.dirname(__file__), "..", ".env")
+
+env = dotenv_values(ENV_PATH)
 
 conn = psycopg2.connect(
     host=env["POSTGRES_HOST"],

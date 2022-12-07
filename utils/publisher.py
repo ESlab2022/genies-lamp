@@ -16,7 +16,10 @@ def main(env):
             # Fill the payload
             payload = psutil.cpu_percent()
             # Publish the message to topic
-            client.publish(topic="cpu", payload=payload)
+            client.publish(topic="/lamp1/temperature", payload=payload)
+            client.publish(topic="/lamp1/humidity", payload=payload*2)
+            client.publish(topic="/lamp1/pressure", payload=payload*10)
+            client.publish(topic="/lamp1/emergency", payload=1)
             time.sleep(1)
     except KeyboardInterrupt as e:
         client.loop_stop()
