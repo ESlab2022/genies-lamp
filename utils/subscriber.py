@@ -1,36 +1,63 @@
 import time
-import argparse
 
-import psutil
+import psycopg2
 import paho.mqtt.client as mqtt
+from dotenv import dotenv_values
+
+conn = psycopg2.connect(
+    host="localhost",
+    database="postgres",
+    user="postgres",
+    password="postgres",
+    port="5432",
+)
+
 
 def on_message(client, obj, msg):
     print(f"TOPIC:{msg.topic}, VALUE:{msg.payload}")
+    # write data to database
+    if msg.topic == "cpu":
+        payload = float(msg.payload.decode("utf-8"))
+        # get timestamp in sql format in utc timezone
+        timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
+        cur = conn.cursor()
+        cur.execute(
+            """
+            INSERT INTO cpu (value, timestamp) VALUES (%s, %s);
+            """,
+            (payload, timestamp),
+        )
+        conn.commit()
 
-def main(args):
+
+def main(env):
     # Establish connection to mqtt broker
     client = mqtt.Client()
     client.on_message = on_message
-    client.connect(host=args['ip'], port=args['port'])
-    client.subscribe('cpu', 0)
-    client.subscribe('mem', 0)
-    client.subscribe('TEMPERATURE', 0)
-    client.subscribe('PRESSURE', 0)
-    client.subscribe('HUMIDITY', 0)
+    client.connect(host=env["HOST_IP"], port=int(env["HOST_PORT"]))
+    client.subscribe("cpu", 0)
 
     try:
         client.loop_forever()
     except KeyboardInterrupt as e:
         pass
 
+
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--ip",
-                        default="localhost",
-                        help="service ip of MQTT broker")
-    parser.add_argument("--port",
-                        default=1883,
-                        type=int,
-                        help="service port of MQTT broker")
-    args = vars(parser.parse_args())
-    main(args)
+    # create a table cpu if not exists
+    cur = conn.cursor()
+    cur.execute(
+        """
+        CREATE TABLE IF NOT EXISTS cpu (
+            id SERIAL PRIMARY KEY,
+            value FLOAT NOT NULL,
+            timestamp TIMESTAMP NOT NULL
+        );
+        """
+    )
+    conn.commit()
+
+    env = dotenv_values("../.env")
+    main(env)
+
+    conn.close()
