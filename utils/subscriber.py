@@ -38,6 +38,15 @@ def main(env):
     client.on_message = on_message
     client.connect(host=env["HOST_IP"], port=int(env["HOST_PORT"]))
     client.subscribe("cpu", 0)
+    client.subscribe("mem", 0)
+
+    device_list = [0, 1]
+    for i in device_list:
+        client.subscribe(f"lamp{i}/PWM", 0)
+        client.subscribe(f"lamp{i}/TEMPERATURE", 0)
+        client.subscribe(f"lamp{i}/PRESSURE", 0)
+        client.subscribe(f"lamp{i}/HUMIDITY", 0)
+        client.subscribe(f"lamp{i}/BUTTON", 0)
 
     try:
         client.loop_forever()

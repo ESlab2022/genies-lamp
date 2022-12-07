@@ -14,8 +14,12 @@
  * limitations under the License.
  */
 
+#include "InterruptIn.h"
+#include "PinNames.h"
 #include "mbed.h"
 #include <cstdio>
+#include <stdlib.h>
+#include <string.h>
 
 // To connect to internet with WiFi
 #include "stm32_hal_legacy.h"
@@ -32,6 +36,11 @@
 // For MQTT client
 #include <MQTTClientMbedOs.h>
 
+#define PERIOD 0.01f
+#define DEVICE_ID 1
+
+PwmOut led(PA_7);
+InterruptIn button(BUTTON1);
 
 void messageArrived(MQTT::MessageData &md)
 {
@@ -40,6 +49,16 @@ void messageArrived(MQTT::MessageData &md)
     printf("Payload %.*s\r\n", message.payloadlen, (char *)message.payload);
 }
 
+void pwmArrived(MQTT::MessageData &md)
+{
+    MQTT::Message &message = md.message;
+    printf("Message arrived: qos %d, retained %d, dup %d, packetid %d\r\n", message.qos, message.retained, message.dup, message.id);
+    printf("PWM %.*s\r\n", message.payloadlen, (char *)message.payload);
+
+    int duty_cycle = atoi((char *)message.payload);
+    float pulsewidth = PERIOD * (duty_cycle/100.0f);
+    led.pulsewidth(pulsewidth);
+}
 
 class Client {
     static constexpr size_t MAX_NUMBER_OF_ACCESS_POINTS = 10;
@@ -123,8 +142,10 @@ public:
         message.dup = false;
         message.payload = (void*)payload_buf;
         message.payloadlen = strlen(payload_buf);
-
-        nsapi_error_t result = _mqtt_client->publish(topic, message);
+        
+        char buf[100];
+        sprintf(buf, "lamp%d/%s", DEVICE_ID, topic);
+        nsapi_error_t result = _mqtt_client->publish(buf, message);
 
         if (result != 0) {
             printf("Error! client.publish returned: %d\r\n", result);
@@ -137,7 +158,16 @@ public:
 
     void subscribe(const char * topic)
     {
+        printf("Subscribe to %s\n", topic);
         _mqtt_client->subscribe(topic, MQTT::QOS0, messageArrived);
+    }
+
+    void subscribe_pwm()
+    {
+        char *buf = new char[100];
+        sprintf(buf, "lamp%d/PWM", DEVICE_ID);
+        printf("Subscribe to pwm %s\n", buf);
+        _mqtt_client->subscribe(buf, MQTT::QOS0, pwmArrived);
     }
 
     void unscbscribe(const char * topic)
@@ -220,11 +250,22 @@ private:
     MQTTClient* _mqtt_client;
 };
 
+volatile int button_status;
+
+void button_pressed() {
+    button_status = 1;
+}
+
+void button_released() {
+    button_status = 0;
+}
+
 int main() {
 
     float temp_value = 0;
     float humid_value = 0;
     float pressure_value = 0;
+    int last_button_status = 0;
 
     char buf[100];
 
@@ -232,6 +273,9 @@ int main() {
     BSP_HSENSOR_Init();
     BSP_PSENSOR_Init();
 
+    led.period(PERIOD);
+    button.fall(&button_pressed);
+    button.rise(&button_released);
 
     Client *client = new Client();
 
@@ -239,11 +283,13 @@ int main() {
     client->init_MQTT();
 
     if (client->isConnected())
-        printf("Successfully connected to broker!");
+        printf("Successfully connected to broker!\n");
     else
-        printf("Error! mqtt client is not connected to broken");
+        printf("Error! mqtt client is not connected to broken\n");
 
-    client->subscribe("mem");
+    // client->subscribe("mem");
+
+    client->subscribe_pwm();
 
     while(1) {
         temp_value = BSP_TSENSOR_ReadTemp();
@@ -261,6 +307,17 @@ int main() {
         // printf("PRESSURE = %.2f mBar\n", pressure_value);
         client->publish("PRESSURE", buf);
         
+        // printf("%d %d\n", last_button_status, button_status);
+
+        if (last_button_status == 0 && button_status == 1) {
+            printf("pressed\n");
+            sprintf(buf, "%d", button_status);
+            client->publish("BUTTON", buf);
+            last_button_status = 1;
+        } else {
+            last_button_status = button_status;
+        }
+
         client->yield(500);
         // printf("\n");
     }
