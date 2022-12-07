@@ -14,7 +14,6 @@ services:
       - "$HOST_IP:3000:3000"
     networks:
       - lamp
-
   mqtt:
     image: eclipse-mosquitto
     restart: unless-stopped
@@ -31,8 +30,8 @@ services:
       - POSTGRES_DB=$POSTGRES_DB
       - POSTGRES_USER=$POSTGRES_USER
       - POSTGRES_PASSWORD=$POSTGRES_PASS
-    ports:
-      - '$POSTGRES_PORT:5432'
+    expose:
+      - '127.0.0.1:$POSTGRES_PORT:5432'
     volumes: 
       - ./data/postgres:/var/lib/postgresql/data
     networks:
