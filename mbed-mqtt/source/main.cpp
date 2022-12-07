@@ -144,7 +144,7 @@ public:
         message.payloadlen = strlen(payload_buf);
         
         char buf[100];
-        sprintf(buf, "lamp%d/%s", DEVICE_ID, topic);
+        sprintf(buf, "/lamp%d/%s", DEVICE_ID, topic);
         nsapi_error_t result = _mqtt_client->publish(buf, message);
 
         if (result != 0) {
@@ -165,7 +165,7 @@ public:
     void subscribe_pwm()
     {
         char *buf = new char[100];
-        sprintf(buf, "lamp%d/PWM", DEVICE_ID);
+        sprintf(buf, "/lamp%d/brightness", DEVICE_ID);
         printf("Subscribe to pwm %s\n", buf);
         _mqtt_client->subscribe(buf, MQTT::QOS0, pwmArrived);
     }
@@ -295,24 +295,24 @@ int main() {
         temp_value = BSP_TSENSOR_ReadTemp();
         sprintf(buf, "%.2f", temp_value);
         // printf("\nTEMPERATURE = %.2f degC\n", temp_value);
-        client->publish("TEMPERATURE", buf);
+        client->publish("temperature", buf);
 
         humid_value = BSP_HSENSOR_ReadHumidity();
         sprintf(buf, "%.2f", humid_value);
         // printf("HUMIDITY = %.2f %%\n", humid_value);
-        client->publish("HUMIDITY", buf);
+        client->publish("humidity", buf);
 
         pressure_value = BSP_PSENSOR_ReadPressure();
         sprintf(buf, "%.2f", pressure_value);
         // printf("PRESSURE = %.2f mBar\n", pressure_value);
-        client->publish("PRESSURE", buf);
+        client->publish("pressure", buf);
         
         // printf("%d %d\n", last_button_status, button_status);
 
         if (last_button_status == 0 && button_status == 1) {
             printf("pressed\n");
             sprintf(buf, "%d", button_status);
-            client->publish("BUTTON", buf);
+            client->publish("emergency", buf);
             last_button_status = 1;
         } else {
             last_button_status = button_status;

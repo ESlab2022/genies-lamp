@@ -17,7 +17,7 @@ def main(args):
             # Fill the payload
             duty_cycle = (duty_cycle + 10) % 100
             # Publish the message to topic
-            client.publish(topic=f'lamp{args["device"]}/PWM', payload=duty_cycle)
+            client.publish(topic=f'/lamp{args["device"]}/brightness', payload=duty_cycle)
             time.sleep(1)
     except KeyboardInterrupt as e:
         client.loop_stop()

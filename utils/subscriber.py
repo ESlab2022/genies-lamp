@@ -42,11 +42,11 @@ def main(env):
 
     device_list = [0, 1]
     for i in device_list:
-        client.subscribe(f"lamp{i}/PWM", 0)
-        client.subscribe(f"lamp{i}/TEMPERATURE", 0)
-        client.subscribe(f"lamp{i}/PRESSURE", 0)
-        client.subscribe(f"lamp{i}/HUMIDITY", 0)
-        client.subscribe(f"lamp{i}/BUTTON", 0)
+        client.subscribe(f"/lamp{i}/brightness", 0)
+        client.subscribe(f"/lamp{i}/temperature", 0)
+        client.subscribe(f"/lamp{i}/pressure", 0)
+        client.subscribe(f"/lamp{i}/humidity", 0)
+        client.subscribe(f"/lamp{i}/emergency", 0)
 
     try:
         client.loop_forever()
