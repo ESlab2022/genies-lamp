@@ -2,9 +2,9 @@ import time
 
 import paho.mqtt.client as mqtt
 
-from .env import env
-from .db import write_to_db, get_timestamp
-from .config import config
+from env import env
+from db import write_to_db, get_timestamp
+from config import config
 
 __all__ = ["init_client", "start_client"]
 
@@ -39,7 +39,7 @@ client = mqtt.Client()
 
 def init_client():
     client.on_message = on_message
-    client.connect(host=env["HOST_IP"], port=int(env["HOST_PORT"]))
+    client.connect(host=env["MQTT_HOST"], port=int(env["MQTT_PORT"]))
     for i in range(config["devices"]):
         client.subscribe(f"/lamp{i}/brightness", 0)
         client.subscribe(f"/lamp{i}/temperature", 0)

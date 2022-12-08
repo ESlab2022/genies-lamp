@@ -8,7 +8,7 @@ from dotenv import dotenv_values
 def main(env):
     # Establish connection to mqtt broker
     client = mqtt.Client()
-    client.connect(host=env["HOST_IP"], port=int(env["HOST_PORT"]))
+    client.connect(host=env["MQTT_HOST"], port=int(env["MQTT_PORT"]))
     client.loop_start()
 
     try:

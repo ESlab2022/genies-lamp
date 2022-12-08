@@ -1,5 +1,5 @@
-from .mqtt import init_client, start_client
-from .db import init_db
+from mqtt import init_client, start_client
+from db import init_db
 
 def main():
     init_db()

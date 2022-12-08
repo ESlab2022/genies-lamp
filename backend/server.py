@@ -1,12 +1,11 @@
 from flask import Flask, request
-from .mqtt import publish
+from mqtt import publish
 
-app = Flask("app")
+app = Flask(__name__)
 
-# handle post request on /turnOn
-@app.route("/turnOn", methods=["POST"])
+@app.route("/turnOn", methods=["GET"])
 def turnOn():
-    data = request.json
+    data = request.args
     # single number
     deviceID = data.get("deviceID")
     if deviceID == None:
@@ -15,10 +14,9 @@ def turnOn():
     publish(topic=f"/lamp{deviceID}/brightness", payload=100)
     return "OK"
 
-# handle post request on /turnOff
-@app.route("/turnOff", methods=["POST"])
+@app.route("/turnOff", methods=["GET"])
 def turnOff():
-    data = request.json
+    data = request.args
     # single number
     deviceID = data.get("deviceID")
     if deviceID == None:
@@ -27,10 +25,9 @@ def turnOff():
     publish(topic=f"/lamp{deviceID}/brightness", payload=0)
     return "OK"
 
-# handle post request on /setBrightness
-@app.route("/setBrightness", methods=["POST"])
+@app.route("/setBrightness", methods=["GET"])
 def setBrightness():
-    data = request.json
+    data = request.args
     # single number
     deviceID = data.get("deviceID")
     # 0 - 100

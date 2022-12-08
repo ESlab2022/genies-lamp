@@ -2,8 +2,8 @@ import time
 
 import psycopg2
 
-from .env import env
-from .config import config
+from env import env
+from config import config
 
 conn = psycopg2.connect(
     host=env["POSTGRES_HOST"],
