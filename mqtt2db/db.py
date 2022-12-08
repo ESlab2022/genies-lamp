@@ -31,6 +31,7 @@ def init_db():
             ADD COLUMN IF NOT EXISTS value {datatype} NOT NULL;
             """
         )
+    conn.commit()
 
 def get_timestamp():
     return time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
