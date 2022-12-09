@@ -15,9 +15,10 @@ def main(args):
         duty_cycle = 0
         while True:
             # Fill the payload
-            duty_cycle = (duty_cycle + 10) % 100
+            duty_cycle += 1
             # Publish the message to topic
-            client.publish(topic=f'/lamp{args["device"]}/brightness', payload=duty_cycle)
+            client.publish(topic=f'/lamp{0}/brightness', payload=((duty_cycle) % 2) * 100)
+            client.publish(topic=f'/lamp{1}/brightness', payload=((duty_cycle) % 2) * 100)
             time.sleep(1)
     except KeyboardInterrupt as e:
         client.loop_stop()
@@ -29,6 +30,6 @@ if __name__ == "__main__":
     parser.add_argument(
         "--port", default=1883, type=int, help="service port of MQTT broker"
     )
-    parser.add_argument("--device", default=0, type=int, help="lamp id")
+    # parser.add_argument("--device", default=0, type=int, help="lamp id")
     args = vars(parser.parse_args())
     main(args)
