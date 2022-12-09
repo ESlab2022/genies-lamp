@@ -127,7 +127,10 @@ public:
 
         MQTTPacket_connectData data = MQTTPacket_connectData_initializer;
         data.MQTTVersion = 3;
-        data.clientID.cstring = (char *)"MQTT_CONNECT";
+
+        char *clientID = new char[10];
+        sprintf(clientID, "lamp%d", DEVICE_ID);
+        data.clientID.cstring = clientID;
 
         _mqtt_client->connect(data);    
         return;
