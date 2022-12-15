@@ -23,7 +23,7 @@ services:
     volumes:
       - ./conf/mqtt/mosquitto.conf:/mosquitto/config/mosquitto.conf
       - ./data/mqtt/data:/mosquitto/data
-      - ./log/mqtt/mosquitto.log:/mosquitto/log/mosquitto.log
+      # - ./log/mqtt/mosquitto.log:/mosquitto/log/mosquitto.log
     ports:
       - "$MQTT_HOST:$MQTT_PORT:1883"
     networks:

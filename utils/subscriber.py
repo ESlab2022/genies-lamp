@@ -32,9 +32,9 @@ if __name__ == "__main__":
     # get arguments
     topics = [
         "brightness",
-        # "temperature",
-        # "pressure",
-        # "humidity",
+        "temperature",
+        "pressure",
+        "humidity",
         "emergency",
     ]
     main(env, topics)
