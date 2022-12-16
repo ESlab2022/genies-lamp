@@ -10,7 +10,7 @@
 // For MQTT client
 #include <MQTTClientMbedOs.h>
 
-#define LAMP_ID 1
+#define LAMP_ID 0
 #define PERIOD 0.01f
 
 extern PwmOut led;
@@ -91,6 +91,20 @@ class Client {
         return;
     }
 
+    void reconnect() {
+        free(_mqtt_client);
+        _socket.close();
+
+        nsapi_connection_status_t net_status = _net->get_connection_status();
+        nsapi_connection_status_t wifi_status = _wifi->get_connection_status();
+        if (net_status < 2 || wifi_status < 2) {
+            init_WiFi();
+        }
+
+        init_MQTT();
+        printf("Reconnected\n");
+    }
+
     void publish(const char *topic, const char *payload_buf) {
         MQTT::Message message;
 
@@ -107,6 +121,7 @@ class Client {
 
         if (result != 0) {
             printf("Error! client.publish returned: %d\r\n", result);
+            reconnect();
             return;
         }
 
@@ -128,18 +143,25 @@ class Client {
 
     void unscbscribe(const char *topic) { _mqtt_client->unsubscribe(topic); }
 
-    void yield(const float yeild_time) { _mqtt_client->yield(yeild_time); }
+    void yield(const float yeild_time) {
+        nsapi_error_t result = _mqtt_client->yield(yeild_time); 
+        if (result != 0) {
+            printf("Error! client.yield returned: %d\r\n", result);
+            reconnect();
+            return;
+        }
+    }
 
     bool isConnected() { return _mqtt_client->isConnected(); }
 
    private:
     void wifi_scan() {
-        WiFiInterface *wifi = _net->wifiInterface();
+        _wifi = _net->wifiInterface();
 
         WiFiAccessPoint ap[MAX_NUMBER_OF_ACCESS_POINTS];
 
         /* scan call returns number of access points found */
-        int result = wifi->scan(ap, MAX_NUMBER_OF_ACCESS_POINTS);
+        int result = _wifi->scan(ap, MAX_NUMBER_OF_ACCESS_POINTS);
 
         if (result <= 0) {
             printf("WiFiInterface::scan() failed with return value: %d\r\n", result);
@@ -189,6 +211,7 @@ class Client {
 
    private:
     NetworkInterface *_net;
+    WiFiInterface* _wifi;
     TCPSocket _socket;
     MQTTClient *_mqtt_client;
 };

@@ -137,7 +137,7 @@ int main() {
 
         client->yield(100);
         // scanner.scan_phone();
-        event_queue.dispatch_for(500ms);
+        event_queue.dispatch_for(1000ms);
 
         if (scanner.phone_near) {
             // printf("near\n");

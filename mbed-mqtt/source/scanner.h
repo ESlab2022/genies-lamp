@@ -13,6 +13,15 @@
 extern events::EventQueue event_queue;
 extern PwmOut led;
 
+static const ble::ScanParameters scan_params(
+            ble::phy_t::LE_1M,
+            ble::scan_interval_t(80),
+            ble::scan_window_t(60),
+            false /* active scanning */
+        );
+
+static const ble::scan_duration_t scan_duration(ble::millisecond_t(900));
+
 class Scanner : private mbed::NonCopyable<Scanner>, public ble::Gap::EventHandler {
    public:
     Scanner(BLE& ble, events::EventQueue& event_queue)
@@ -40,7 +49,7 @@ class Scanner : private mbed::NonCopyable<Scanner>, public ble::Gap::EventHandle
         }
 
         /* to show we're running we'll blink every 500ms */
-        _event_queue.call_every(500, this, &Scanner::blink);
+        _event_queue.call_every(500ms, this, &Scanner::blink);
 
         /* this will not return until shutdown */
         // _event_queue.dispatch_forever();
@@ -63,7 +72,7 @@ class Scanner : private mbed::NonCopyable<Scanner>, public ble::Gap::EventHandle
         print_mac_address();
 
         /* all calls are serialised on the user thread through the event queue */
-        _event_queue.call(this, &Scanner::scan);
+        _event_queue.call_every(1000ms, this, &Scanner::scan);
     }
 
     void scan() {
@@ -78,7 +87,8 @@ class Scanner : private mbed::NonCopyable<Scanner>, public ble::Gap::EventHandle
             return;
         }
 
-        error = _gap.startScan(ble::scan_duration_t::forever());
+        
+        error = _gap.startScan(scan_duration);
 
         if (error) {
             print_error(error, "Error caused by Gap::startScan\r\n");
@@ -90,11 +100,11 @@ class Scanner : private mbed::NonCopyable<Scanner>, public ble::Gap::EventHandle
 
     virtual void onAdvertisingReport(const ble::AdvertisingReportEvent& event) {
         // printf("onAdvertisingReport\n");
-        static int count = 0;
-        count++;
-        if (count % 3 != 0) {
-            return;
-        }
+        // static int count = 0;
+        // count++;
+        // if (count % 3 != 0) {
+        //     return;
+        // }
 
         ble::AdvertisingDataParser adv_parser(event.getPayload());
 
@@ -120,6 +130,7 @@ class Scanner : private mbed::NonCopyable<Scanner>, public ble::Gap::EventHandle
                 if (field.value.data()[0] == 'T' && event.getRssi() > -70) {
                     // printf("RSSI: %d\n", event.getRssi());
                     phone_near = true;
+                    return;
                 }
             }
         }
