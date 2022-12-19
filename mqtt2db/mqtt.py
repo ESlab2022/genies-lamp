@@ -33,8 +33,6 @@ def on_message(client, obj, msg):
         write_to_db(table, payload)
 
 
-
-
 client = mqtt.Client()
 
 def init_client():
