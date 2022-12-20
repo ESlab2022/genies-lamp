@@ -17,7 +17,7 @@ def main(env, topics):
     client.on_message = on_message
     client.connect(host=env["MQTT_HOST"], port=int(env["MQTT_PORT"]))
 
-    device_list = [0, 1]
+    device_list = range(5)
     for i in device_list:
         for t in topics:
             client.subscribe(f"/lamp{i}/{t}", 0)

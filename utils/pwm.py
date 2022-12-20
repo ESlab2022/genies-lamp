@@ -16,10 +16,12 @@ def main(args):
         while True:
             # Fill the payload
             duty_cycle += 1
+            
             # Publish the message to topic
-            client.publish(topic=f'/lamp{0}/brightness', payload=((duty_cycle) % 2) * 100)
-            client.publish(topic=f'/lamp{1}/brightness', payload=((duty_cycle) % 2) * 100)
+            for i in range(5):
+                client.publish(topic=f'/lamp{i}/brightness', payload=((duty_cycle) % 2) * 100)
             time.sleep(1)
+            
     except KeyboardInterrupt as e:
         client.loop_stop()
 
