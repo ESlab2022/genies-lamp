@@ -19,7 +19,8 @@ def main(args):
             
             # Publish the message to topic
             for i in range(5):
-                client.publish(topic=f'/lamp{i}/brightness', payload=((duty_cycle) % 2) * 100)
+                payload = "50,100,100" if duty_cycle % 2 == 0 else "0,0,0"
+                client.publish(topic=f'/lamp{i}/brightness', payload=payload)
             time.sleep(1)
             
     except KeyboardInterrupt as e:

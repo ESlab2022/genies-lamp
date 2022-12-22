@@ -10,11 +10,10 @@
 // For MQTT client
 #include <MQTTClientMbedOs.h>
 
-#define LAMP_ID 0
-#define PERIOD 0.01f
+#define LAMP_ID 2
 
-extern PwmOut led;
-extern InterruptIn button;
+// extern PwmOut led;
+// extern InterruptIn button;
 
 extern void messageArrived(MQTT::MessageData &md);
 extern void pwmArrived(MQTT::MessageData &md);
