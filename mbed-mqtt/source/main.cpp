@@ -22,7 +22,7 @@
 events::EventQueue event_queue;
 
 Light light;
-InterruptIn button(PA_3);
+InterruptIn button(PA_5);
 
 void messageArrived(MQTT::MessageData &md) {
     MQTT::Message &message = md.message;
@@ -108,7 +108,7 @@ int main() {
         // printf("PRESSURE = %.2f mBar\n", pressure_value);
         client->publish("pressure", buf);
 
-        // printf("%d\n", button_status);
+        printf("%d\n", button_status);
         if (last_button_status * button_status < 0) {
             if (button_status == 1) {
                 printf("pressed\n");
@@ -126,13 +126,15 @@ int main() {
 
         bool phone_near;
         if (scanner.phone_near) {
-            // printf("near\n");
+            printf("near\n");
             // led.pulsewidth(PERIOD);
             phone_near = true;
+            client->publish("proximity", "1");
             last_on_time = time(NULL);
         } else {
             if (time(NULL) - last_on_time > 1) {
                 phone_near = false;
+                client->publish("proximity", "0");
                 // led.pulsewidth(0);
             }
         }

@@ -43,7 +43,7 @@ class Client {
         /* if we're using a wifi interface run a quick scan */
         if (_net->wifiInterface()) {
             /* the scan is not required to connect and only serves to show visible access points */
-            wifi_scan();
+            // wifi_scan();
 
             /* in this example we use credentials configured at compile time which are used by
              * NetworkInterface::connect() but it's possible to do this at runtime by using the

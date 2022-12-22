@@ -37,19 +37,19 @@ class Light {
     void set_color(light_state state) {
         switch (state) {
             case light_state::EMERGENCY:
-                led_r->pulsewidth(PERIOD * (1-RED[0] / 100.0f));
-                led_g->pulsewidth(PERIOD * (1-RED[1] / 100.0f));
-                led_b->pulsewidth(PERIOD * (1-RED[2] / 100.0f));
+                led_r->pulsewidth(PERIOD * (1 - RED[0] / 100.0f));
+                led_g->pulsewidth(PERIOD * (1 - RED[1] / 100.0f));
+                led_b->pulsewidth(PERIOD * (1 - RED[2] / 100.0f));
                 break;
             case light_state::SERVER:
-                led_r->pulsewidth(PERIOD * (1-from_server[0] / 100.0f));
-                led_g->pulsewidth(PERIOD * (1-from_server[1] / 100.0f));
-                led_b->pulsewidth(PERIOD * (1-from_server[2] / 100.0f));
+                led_r->pulsewidth(PERIOD * (1 - from_server[0] / 100.0f));
+                led_g->pulsewidth(PERIOD * (1 - from_server[1] / 100.0f));
+                led_b->pulsewidth(PERIOD * (1 - from_server[2] / 100.0f));
                 break;
             case light_state::PROXIMITY:
-                led_r->pulsewidth(PERIOD * (1-WHITE[0] / 100.0f));
-                led_g->pulsewidth(PERIOD * (1-WHITE[1] / 100.0f));
-                led_b->pulsewidth(PERIOD * (1-WHITE[2] / 100.0f));
+                led_r->pulsewidth(PERIOD * (1 - WHITE[0] / 100.0f));
+                led_g->pulsewidth(PERIOD * (1 - WHITE[1] / 100.0f));
+                led_b->pulsewidth(PERIOD * (1 - WHITE[2] / 100.0f));
                 break;
             case light_state::OFF:
                 led_r->pulsewidth(PERIOD);
