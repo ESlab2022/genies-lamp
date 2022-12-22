@@ -4,6 +4,7 @@
     "temperature": "FLOAT",
     "humidity": "FLOAT",
     "pressure": "FLOAT",
-    "emergency": "BOOL"
+    "emergency": "BOOL",
+    "proximity": "BOOL"
   }
 }
