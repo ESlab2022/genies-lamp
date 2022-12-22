@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+#include "DigitalIn.h"
 #include "InterruptIn.h"
 #include "PinNames.h"
 #include "mbed.h"
@@ -35,7 +36,8 @@
 events::EventQueue event_queue;
 
 PwmOut led(PA_7);
-InterruptIn button(BUTTON1);
+// InterruptIn button(BUTTON1);
+InterruptIn button(PA_3);
 
 void messageArrived(MQTT::MessageData &md) {
     MQTT::Message &message = md.message;
@@ -55,14 +57,14 @@ void pwmArrived(MQTT::MessageData &md) {
     led.pulsewidth(pulsewidth);
 }
 
-volatile int button_status;
+volatile int button_status = -1;
 
 void button_pressed() {
     button_status = 1;
 }
 
 void button_released() {
-    button_status = 0;
+    button_status = -1;
 }
 
 void schedule_ble_events(BLE::OnEventsToProcessCallbackContext* context) {
@@ -89,8 +91,8 @@ int main() {
     scanner.run();
 
     led.period(PERIOD);
-    button.fall(&button_pressed);
-    button.rise(&button_released);
+    button.rise(&button_pressed);
+    button.fall(&button_released);
 
     Client *client = new Client();
 
@@ -123,17 +125,18 @@ int main() {
         sprintf(buf, "%.2f", pressure_value);
         // printf("PRESSURE = %.2f mBar\n", pressure_value);
         client->publish("pressure", buf);
-        
-        // printf("%d %d\n", last_button_status, button_status);
 
-        if (last_button_status == 0 && button_status == 1) {
-            printf("pressed\n");
-            sprintf(buf, "%d", button_status);
-            client->publish("emergency", buf);
-            last_button_status = 1;
-        } else {
-            last_button_status = button_status;
+        // printf("%d\n", button_status);
+        if (last_button_status * button_status < 0) {
+            if (button_status == 1) {
+                printf("pressed\n");
+                client->publish("emergency", "1");
+            } else {
+                printf("released\n");
+                client->publish("emergency", "0");
+            }
         }
+        last_button_status = button_status;
 
         client->yield(100);
         // scanner.scan_phone();
