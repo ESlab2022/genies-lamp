@@ -1,29 +1,19 @@
-import { useState } from 'react'
+import React from "react";
+import { useState } from "react";
+import NavBar from "./components/Navbar";
+import ControlTable from "./components/ControlTable";
 
-function App() {
-  const [count, setCount] = useState(0)
+const App = () => {
+  const [count, setCount] = useState(0);
 
   return (
-    <div className="App">
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" className="logo" alt="Vite logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+    <div>
+      <NavBar />
+      <main className="flex flex-col items-center pt-32 py-2 w-[1068px] mx-auto h-screen">
+        <ControlTable />
+      </main>
     </div>
-  )
-}
+  );
+};
 
-export default App
+export default App;
