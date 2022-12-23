@@ -23,6 +23,7 @@ def on_message(client, obj, msg):
             value = int(msg.payload.decode("utf-8"))
         elif dataType == "BOOL":
             value = int(msg.payload.decode("utf-8"))
+            value = "true" if value == 1 else "false"
         
         timestamp = get_timestamp()
         payload = {
