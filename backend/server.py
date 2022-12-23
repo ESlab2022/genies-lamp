@@ -129,4 +129,6 @@ def getState():
         else:
             data[deviceID] = {"emergency": 0, "proximity": proximity[deviceID]}
 
+    print(data, flush=True)
+
     return jsonify(data)
