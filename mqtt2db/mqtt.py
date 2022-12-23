@@ -41,7 +41,7 @@ def init_client():
     # subscribe to all topics
     for i in range(config["devices"]):
         for topic in config["subscriptions"]:
-            client.subscribe(f"lamp{i}/{topic}")
+            client.subscribe(f"/lamp{i}/{topic}")
 
 def start_client():
     try:
