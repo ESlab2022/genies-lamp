@@ -1,16 +1,23 @@
-import React from "react";
+import React, { useCallback, useState } from "react";
+import debounce from "lodash/debounce";
 
 export interface BrightnessControlProps {
-  brightness: number;
   onBrightnessChange: (brightness: number) => void;
 }
 
 export const BrightnessControl = ({
-  brightness,
   onBrightnessChange,
 }: BrightnessControlProps) => {
+  const [brightness, setBrightness] = useState(0);
+
+  const debouncedBrightnessChange = useCallback(
+    debounce(onBrightnessChange, 500),
+    [onBrightnessChange]
+  );
+
   const handleBrightnessChange = (brightness: number) => {
-    onBrightnessChange(brightness);
+    setBrightness(brightness);
+    debouncedBrightnessChange(brightness);
   };
 
   return (

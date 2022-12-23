@@ -21,6 +21,7 @@ export const ControlTableRow = ({
   const { pushToast } = useToasts();
   const [color, setColor] = useState("#FFFFFF");
   const [brightness, setBrightness] = useState(0);
+
   const mutation = useMutation<
     unknown,
     unknown,
@@ -73,13 +74,10 @@ export const ControlTableRow = ({
           {deviceId}
         </th>
         <td className="py-4 px-6">
-          <ColorControl color={color} onColorChange={onColorChange} />
+          <ColorControl onColorChange={onColorChange} />
         </td>
         <td className="py-4 px-6">
-          <BrightnessControl
-            brightness={brightness}
-            onBrightnessChange={onBrightnessChange}
-          />
+          <BrightnessControl onBrightnessChange={onBrightnessChange} />
         </td>
         <td className="py-4 px-6">{nearby}</td>
       </tr>

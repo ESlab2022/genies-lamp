@@ -3,13 +3,12 @@ import clsx from "clsx";
 import { HexColorPicker } from "react-colorful";
 
 export interface ColorControlProps {
-  color: string;
   onColorChange: (color: string) => void;
 }
 
-export const ColorControl = ({ color, onColorChange }: ColorControlProps) => {
+export const ColorControl = ({ onColorChange }: ColorControlProps) => {
   const [modalOpen, setModalOpen] = useState(false);
-  const [internalColor, setInternalColor] = useState(color);
+  const [color, setColor] = useState("#ffffff");
 
   const openModal = () => {
     setModalOpen(true);
@@ -20,11 +19,11 @@ export const ColorControl = ({ color, onColorChange }: ColorControlProps) => {
   };
 
   const handleColorChange = (color: string) => {
-    setInternalColor(color);
+    setColor(color);
   };
 
   const handleSubmit = () => {
-    onColorChange(internalColor);
+    onColorChange(color);
     closeModal();
   };
 
@@ -35,11 +34,11 @@ export const ColorControl = ({ color, onColorChange }: ColorControlProps) => {
         type="button"
         data-modal-toggle="defaultModal"
         style={{
-          backgroundColor: internalColor,
+          backgroundColor: color,
         }}
         onClick={openModal}
       >
-        {internalColor}
+        {color}
       </button>
 
       <div
