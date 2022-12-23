@@ -4,8 +4,7 @@ services:
     image: grafana/grafana:latest
     restart: unless-stopped
     volumes:
-      - ./data/grafana/data:/var/lib/grafana
-      - ./data/grafana/provisioning:/etc/grafana/provisioning
+      - grafana-storage:/var/lib/grafana
     environment:
       - GF_SECURITY_ADMIN_USER=$GF_ADMIN
       - GF_SECURITY_ADMIN_PASSWORD=$GF_ADMIN_PASS
@@ -90,3 +89,7 @@ services:
       - backend
 networks:
   lamp:
+
+volumes:
+  grafana-storage:
+    external: true
