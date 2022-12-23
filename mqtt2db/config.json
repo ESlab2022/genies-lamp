@@ -1,5 +1,5 @@
 {
-  "devices": 2,
+  "devices": 3,
   "tables": {
     "temperature": "FLOAT",
     "humidity": "FLOAT",
