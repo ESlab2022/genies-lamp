@@ -13,7 +13,9 @@ export const ControlTable = () => {
   >({
     queryKey: ["deviceState"],
     queryFn: () =>
-      fetch("http://192.168.10.36:4000/getState").then((res) => res.json()),
+      fetch(`${import.meta.env.VITE_BACKEND_URL}/getState`).then((res) =>
+        res.json()
+      ),
     refetchInterval: 500,
     onSuccess(data) {
       Object.entries(data).forEach(([deviceID, { emergency }]) => {
@@ -28,7 +30,7 @@ export const ControlTable = () => {
   });
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <h1 className="text-white">Loading...</h1>;
   }
 
   return (

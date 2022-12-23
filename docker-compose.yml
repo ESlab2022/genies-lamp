@@ -79,8 +79,7 @@ services:
     build: ./frontend
     restart: unless-stopped
     environment:
-      - BACKEND_HOST=$FLASK_HOST
-      - BACKEND_PORT=$FLASK_PORT
+      - VITE_BACKEND_URL=$VITE_BACKEND_URL
     ports:
       - "$MQTT_HOST:3001:3000"
     networks:

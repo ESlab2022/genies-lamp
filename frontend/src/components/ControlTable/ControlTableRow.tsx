@@ -30,7 +30,9 @@ export const ControlTableRow = ({
       const colorCode = color.replace("#", "");
       const realBrightness = brightness * 100;
       return fetch(
-        `http://192.168.10.36:4000/setColor?deviceID=${deviceId}&color=${colorCode}&brightness=${realBrightness}`
+        `${
+          import.meta.env.VITE_BACKEND_URL
+        }/setColor?deviceID=${deviceId}&color=${colorCode}&brightness=${realBrightness}`
       );
     },
     onSuccess: () => {
