@@ -1,17 +1,30 @@
 import React from "react";
 
-export const BrightnessControl = () => {
+export interface BrightnessControlProps {
+  brightness: number;
+  onBrightnessChange: (brightness: number) => void;
+}
+
+export const BrightnessControl = ({
+  brightness,
+  onBrightnessChange,
+}: BrightnessControlProps) => {
+  const handleBrightnessChange = (brightness: number) => {
+    onBrightnessChange(brightness);
+  };
+
   return (
-    <div className="w-full flex flex-row gap-8 items-center justify-center">
+    <div className="flex flex-row gap-8 items-center justify-center">
       <input
         type="range"
         min="0"
         max="1"
         step="0.1"
         className="w-32 h-2 rounded-lg appearance-none cursor-pointer bg-gray-500"
-        // value="2.5"
+        value={brightness}
+        onChange={(e) => handleBrightnessChange(Number(e.target.value))}
       />
-      <span>10</span>
+      <span className="w-4 text-right">{brightness}</span>
     </div>
   );
 };

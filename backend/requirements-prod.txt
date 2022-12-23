@@ -1,5 +1,5 @@
 Flask==2.2.2
 Flask_Cors==3.0.10
 paho_mqtt==1.6.1
-psycopg2_binary==2.9.5
+psycopg2==2.9.5
 python-dotenv==0.21.0

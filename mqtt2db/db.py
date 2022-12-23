@@ -60,4 +60,7 @@ def write_to_db(table, payload):
         INSERT INTO {table} ({keys}) VALUES ({values});        
         """
     )
+    print(f"Writing to {table} successful", flush=True)
     conn.commit()
+    cur.close()
+    

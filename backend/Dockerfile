@@ -5,5 +5,7 @@ EXPOSE 5000
 COPY . /app
 WORKDIR /app
 
-RUN pip install -r requirements.txt
+RUN apt-get update && apt-get -y install libpq-dev gcc && pip install psycopg2
+RUN pip install -r requirements-prod.txt
+
 CMD ["python", "app.py"]

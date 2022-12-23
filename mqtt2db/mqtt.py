@@ -38,11 +38,10 @@ client = mqtt.Client()
 def init_client():
     client.on_message = on_message
     client.connect(host=env["MQTT_HOST"], port=int(env["MQTT_PORT"]))
+    # subscribe to all topics
     for i in range(config["devices"]):
-        client.subscribe(f"/lamp{i}/brightness", 0)
-        client.subscribe(f"/lamp{i}/temperature", 0)
-        client.subscribe(f"/lamp{i}/pressure", 0)
-        client.subscribe(f"/lamp{i}/humidity", 0)
+        for topic in config["subscriptions"]:
+            client.subscribe(f"lamp{i}/{topic}")
 
 def start_client():
     try:

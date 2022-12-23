@@ -6,5 +6,12 @@
     "pressure": "FLOAT",
     "emergency": "BOOL",
     "proximity": "BOOL"
-  }
+  },
+  "subscriptions": [
+    "temperature",
+    "humidity",
+    "pressure",
+    "emergency",
+    "proximity"
+  ]
 }

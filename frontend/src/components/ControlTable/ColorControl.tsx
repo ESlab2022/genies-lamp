@@ -2,8 +2,12 @@ import React, { useState } from "react";
 import clsx from "clsx";
 import { HexColorPicker } from "react-colorful";
 
-export const ColorControl = () => {
-  const colorCode = "#ff0000";
+export interface ColorControlProps {
+  color: string;
+  onColorChange: (color: string) => void;
+}
+
+export const ColorControl = ({ color, onColorChange }: ColorControlProps) => {
   const [modalOpen, setModalOpen] = useState(false);
 
   const openModal = () => {
@@ -17,15 +21,15 @@ export const ColorControl = () => {
   return (
     <>
       <button
-        className="block focus:ring-4 focus:outline-none font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+        className="block focus:ring-4 focus:outline-none font-medium rounded-lg text-sm px-5 py-2.5 text-center w-24"
         type="button"
         data-modal-toggle="defaultModal"
         style={{
-          backgroundColor: colorCode,
+          backgroundColor: color,
         }}
         onClick={openModal}
       >
-        {colorCode}
+        {color}
       </button>
 
       <div
@@ -48,7 +52,7 @@ export const ColorControl = () => {
                 </h3>
               </div>
               <div className="p-6 px-12">
-                <HexColorPicker color={colorCode} />
+                <HexColorPicker color={color} onChange={onColorChange} />
               </div>
               <div className="flex items-center justify-end p-6 space-x-2 border-t rounded-b border-gray-600">
                 <button
