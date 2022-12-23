@@ -9,6 +9,7 @@ export interface ColorControlProps {
 
 export const ColorControl = ({ color, onColorChange }: ColorControlProps) => {
   const [modalOpen, setModalOpen] = useState(false);
+  const [internalColor, setInternalColor] = useState(color);
 
   const openModal = () => {
     setModalOpen(true);
@@ -18,6 +19,15 @@ export const ColorControl = ({ color, onColorChange }: ColorControlProps) => {
     setModalOpen(false);
   };
 
+  const handleColorChange = (color: string) => {
+    setInternalColor(color);
+  };
+
+  const handleSubmit = () => {
+    onColorChange(internalColor);
+    closeModal();
+  };
+
   return (
     <>
       <button
@@ -25,11 +35,11 @@ export const ColorControl = ({ color, onColorChange }: ColorControlProps) => {
         type="button"
         data-modal-toggle="defaultModal"
         style={{
-          backgroundColor: color,
+          backgroundColor: internalColor,
         }}
         onClick={openModal}
       >
-        {color}
+        {internalColor}
       </button>
 
       <div
@@ -52,14 +62,14 @@ export const ColorControl = ({ color, onColorChange }: ColorControlProps) => {
                 </h3>
               </div>
               <div className="p-6 px-12">
-                <HexColorPicker color={color} onChange={onColorChange} />
+                <HexColorPicker color={color} onChange={handleColorChange} />
               </div>
               <div className="flex items-center justify-end p-6 space-x-2 border-t rounded-b border-gray-600">
                 <button
                   data-modal-toggle="defaultModal"
                   type="button"
                   className="text-white focus:ring-4 focus:outline-none font-medium rounded-lg text-sm px-5 py-2.5 text-center bg-blue-600 hover:bg-blue-700 focus:ring-blue-800"
-                  onClick={closeModal}
+                  onClick={handleSubmit}
                 >
                   Save
                 </button>
