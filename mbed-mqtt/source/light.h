@@ -17,9 +17,9 @@ class Light {
     int from_server[3] = {0, 0, 0};
 
     Light() {
-        led_r = new PwmOut(PA_7);
+        led_b = new PwmOut(PA_7);
         led_g = new PwmOut(PA_2);
-        led_b = new PwmOut(PA_15);
+        led_r = new PwmOut(PA_15);
 
         led_r->period(PERIOD);
         led_g->period(PERIOD);
@@ -34,7 +34,7 @@ class Light {
         from_server[2] = b;
     }
 
-    void set_color(light_state state) {
+    void set_state(light_state state) {
         switch (state) {
             case light_state::EMERGENCY:
                 led_r->pulsewidth(PERIOD * (1 - RED[0] / 100.0f));
@@ -57,6 +57,12 @@ class Light {
                 led_b->pulsewidth(PERIOD);
                 break;
         }
+    }
+
+    void set_color(int r, int g, int b) {
+        led_r->pulsewidth(PERIOD * (1 - r / 100.0f));
+        led_g->pulsewidth(PERIOD * (1 - g / 100.0f));
+        led_b->pulsewidth(PERIOD * (1 - b / 100.0f));
     }
 
     bool server_is_on() {

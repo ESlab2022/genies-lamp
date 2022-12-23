@@ -22,7 +22,8 @@
 events::EventQueue event_queue;
 
 Light light;
-InterruptIn button(PA_5);
+// InterruptIn button(PA_5);
+DigitalIn button(PA_4);
 
 void messageArrived(MQTT::MessageData &md) {
     MQTT::Message &message = md.message;
@@ -63,6 +64,8 @@ int main() {
 
     char buf[100];
 
+    light.set_color(0, 0, 0);
+
     BSP_TSENSOR_Init();
     BSP_HSENSOR_Init();
     BSP_PSENSOR_Init();
@@ -73,8 +76,9 @@ int main() {
     scanner.run();
 
     // led.period(PERIOD);
-    button.rise(&button_pressed);
-    button.fall(&button_released);
+    // button.rise(&button_pressed);
+    // button.fall(&button_released);
+    button.mode(PullDown);
 
     Client *client = new Client();
 
@@ -108,8 +112,9 @@ int main() {
         // printf("PRESSURE = %.2f mBar\n", pressure_value);
         client->publish("pressure", buf);
 
+        button_status = button.read();
         printf("%d\n", button_status);
-        if (last_button_status * button_status < 0) {
+        if (last_button_status != button_status) {
             if (button_status == 1) {
                 printf("pressed\n");
                 client->publish("emergency", "1");
@@ -122,7 +127,7 @@ int main() {
 
         client->yield(100);
         // scanner.scan_phone();
-        event_queue.dispatch_for(1000ms);
+        event_queue.dispatch_for(900ms);
 
         bool phone_near;
         if (scanner.phone_near) {
@@ -132,7 +137,7 @@ int main() {
             client->publish("proximity", "1");
             last_on_time = time(NULL);
         } else {
-            if (time(NULL) - last_on_time > 1) {
+            if (time(NULL) - last_on_time > 5) {
                 phone_near = false;
                 client->publish("proximity", "0");
                 // led.pulsewidth(0);
@@ -143,15 +148,19 @@ int main() {
         light_state state;
         if (button_status == 1) {
             state = light_state::EMERGENCY;
+            // scanner.stop_scan();
         } else if (light.server_is_on()) {
             state = light_state::SERVER;
+            // scanner.stop_scan();
         } else if (phone_near) {
             state = light_state::PROXIMITY;
+            // scanner.start_scan();
         } else {
             state = light_state::OFF;
+            // scanner.start_scan();
         }
         // printf("%d\n", state);
-        light.set_color(state);
+        light.set_state(state);
     }
 
     return 0;

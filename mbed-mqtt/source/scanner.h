@@ -15,8 +15,8 @@ extern PwmOut led;
 
 static const ble::ScanParameters scan_params(
             ble::phy_t::LE_1M,
-            ble::scan_interval_t(80),
-            ble::scan_window_t(60),
+            ble::scan_interval_t(1600),
+            ble::scan_window_t(40),
             false /* active scanning */
         );
 
@@ -55,9 +55,13 @@ class Scanner : private mbed::NonCopyable<Scanner>, public ble::Gap::EventHandle
         // _event_queue.dispatch_forever();
     }
 
-    // void scan_phone() {
-    //     _event_queue.call(this, &Scanner::scan);
-    // }
+    void start_scan() {
+        _event_queue.call(this, &Scanner::scan);
+    }
+
+    void stop_scan() {
+        _gap.stopScan();
+    }
 
    public:
     bool phone_near = false;
@@ -72,13 +76,14 @@ class Scanner : private mbed::NonCopyable<Scanner>, public ble::Gap::EventHandle
         print_mac_address();
 
         /* all calls are serialised on the user thread through the event queue */
-        _event_queue.call_every(1000ms, this, &Scanner::scan);
+        // _event_queue.call_every(1000ms, this, &Scanner::scan);
+        _event_queue.call(this, &Scanner::scan);
     }
 
     void scan() {
         // phone_near = false;
-        ble::ScanParameters scan_params;
-        scan_params.setOwnAddressType(ble::own_address_type_t::RANDOM);
+        // ble::ScanParameters scan_params;
+        // scan_params.setOwnAddressType(ble::own_address_type_t::RANDOM);
 
         ble_error_t error = _gap.setScanParameters(scan_params);
 
@@ -88,33 +93,39 @@ class Scanner : private mbed::NonCopyable<Scanner>, public ble::Gap::EventHandle
         }
 
         
-        error = _gap.startScan(scan_duration);
+        printf("start scan\n");
+        error = _gap.startScan();
 
         if (error) {
             print_error(error, "Error caused by Gap::startScan\r\n");
             return;
         }
-
-        // printf("scan_phone\n");
     }
 
     virtual void onAdvertisingReport(const ble::AdvertisingReportEvent& event) {
         // printf("onAdvertisingReport\n");
-        // static int count = 0;
+        static int count = 0;
+        static int mac_cache;
+
+        if (event.getRssi() < -60) return;
+
         // count++;
         // if (count % 3 != 0) {
         //     return;
         // }
 
-        ble::AdvertisingDataParser adv_parser(event.getPayload());
+        // printf("o\n");
 
-        // ble::address_t address = event.getPeerAddress();
+        ble::address_t address = event.getPeerAddress();
         // printf("%d\n", address[5]);
-        // if (address[5] == 0x78) {
+        if (mac_cache != 0 && address[5] == mac_cache) {
         // print_address(address);
-        //     printf("find phone");
-        //     phone_near = true;
-        // }
+            // printf("cache\n");
+            phone_near = true;
+            return;
+        }
+
+        ble::AdvertisingDataParser adv_parser(event.getPayload());
 
         /* parse the advertising payload, looking for a discoverable device */
         while (adv_parser.hasNext()) {
@@ -127,8 +138,9 @@ class Scanner : private mbed::NonCopyable<Scanner>, public ble::Gap::EventHandle
                 // printf("Name: %s\n", field.value.data());
                 // print_address(event.getPeerAddress());
 
-                if (field.value.data()[0] == 'T' && event.getRssi() > -70) {
+                if (field.value.data()[0] == 'T') {
                     // printf("RSSI: %d\n", event.getRssi());
+                    mac_cache = address[5];
                     phone_near = true;
                     return;
                 }
