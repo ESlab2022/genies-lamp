@@ -7,6 +7,9 @@ from env import env
 app = Flask(__name__)
 CORS(app)
 
+
+last_emergency = {}
+
 @app.route("/turnOn", methods=["GET"])
 def turnOn():
     data = request.args
@@ -64,6 +67,20 @@ def getEmergency():
     conn.close()
     # return an object with deviceID as key and emergency as value
     emergency = {x[0]: x[1] for x in emergency}
+
+    temp = emergency.copy()
+
+    # compare to last emergency
+    global last_emergency
+
+    # remove all devices that did not change
+    for deviceID in last_emergency:
+        if deviceID in emergency:
+            if emergency[deviceID] == last_emergency[deviceID]:
+                del emergency[deviceID]
+
+    # update last emergency
+    last_emergency = temp
     
     # convert emergency to json and return
     return jsonify(emergency)

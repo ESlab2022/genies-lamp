@@ -1,10 +1,21 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useContext, useEffect, useMemo } from "react";
 import ReactDOM from "react-dom";
 
 export interface ToastData {
   type: "success" | "warning";
   message: string;
 }
+
+// create a context for the toast
+const ToastContext = React.createContext<{
+  toasts: React.ReactNode[];
+  pushToast: (toastData: ToastData) => void;
+}>({
+  toasts: [],
+  pushToast: () => {},
+});
+
+export const useToasts = () => useContext(ToastContext);
 
 export const Toast = ({ type, message }: ToastData) => {
   if (type === "warning") {
@@ -37,7 +48,7 @@ export const Toast = ({ type, message }: ToastData) => {
     return (
       <div
         id="toast-success"
-        className="flex items-center p-4 mb-4 w-full max-w-xs rounded-lg shadow text-gray-400 bg-gray-800"
+        className="flex items-center p-4 w-full max-w-xs rounded-lg shadow text-gray-400 bg-gray-800"
         role="alert"
       >
         <div className="inline-flex flex-shrink-0 justify-center items-center w-8 h-8 rounded-lg bg-green-800 text-green-200">
@@ -62,55 +73,71 @@ export const Toast = ({ type, message }: ToastData) => {
   }
 };
 
-const classNames = "fixed bottom-0 right-0 m-6".split(" ");
-
-export const showToast = (toastData: ToastData) => {
+const createContainer = () => {
   const container = document.createElement("div");
-
-  classNames.forEach((className) => {
-    container.classList.add(className);
-  });
-  document.body.appendChild(container);
-
-  const toast = ReactDOM.createPortal(
-    <Toast type={toastData.type} message={toastData.message} />,
-    container
-  );
-
-  const timeout = setTimeout(() => {
-    document.body.removeChild(container);
-  }, 3000);
-
-  const cleanup = () => {
-    // remove the container if it's still there
-    if (container.parentNode) {
-      document.body.removeChild(container);
-    }
-    clearTimeout(timeout);
-  };
-
-  return {
-    toast,
-    cleanup,
-  };
+  container.setAttribute("id", "toast-container");
+  const classNames = [
+    "fixed",
+    "bottom-6",
+    "right-6",
+    "z-50",
+    "flex",
+    "flex-col",
+    "items-end",
+    "gap-4",
+  ];
+  container.classList.add(...classNames);
+  return container;
 };
 
-export const useToast = () => {
-  const [toastData, setToastData] = React.useState<ToastData | null>(null);
-  const [toast, setToast] = React.useState<React.ReactPortal | null>(null);
+export const ToastProvider = ({ children }: { children: React.ReactNode }) => {
+  const [toastData, setToastData] = React.useState<ToastData[]>([]);
+  const container = React.useRef<HTMLDivElement | null>(null);
+
+  const toastPortals = useMemo(() => {
+    return toastData.map((toastData) => {
+      return (
+        container.current &&
+        ReactDOM.createPortal(
+          <Toast {...toastData} />,
+          container.current as HTMLDivElement
+        )
+      );
+    });
+  }, [toastData, container.current]);
+
+  const pushToast = useCallback((toastData: ToastData) => {
+    // max 5 toasts
+    setToastData((prev) => [...prev, toastData].slice(-5));
+  }, []);
 
   useEffect(() => {
-    if (toastData) {
-      const { toast: newToast, cleanup } = showToast(toastData);
-      setToast(newToast);
-      return cleanup;
-    }
-  }, [toastData]);
+    container.current = createContainer();
+    document.body.appendChild(container.current);
+    return () => {
+      if (container.current) {
+        document.body.removeChild(container.current);
+      }
+    };
+  }, []);
 
-  return {
-    toast,
-    setToastData,
-  };
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setToastData((prev) => prev.slice(1));
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <ToastContext.Provider
+      value={{
+        toasts: toastPortals,
+        pushToast,
+      }}
+    >
+      {children}
+    </ToastContext.Provider>
+  );
 };
 
-export default Toast;
+export default useToasts;

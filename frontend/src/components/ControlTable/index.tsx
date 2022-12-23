@@ -1,9 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import ControlTableRow from "./ControlTableRow";
-import { useToast } from "../Toast";
+import useToasts from "../../hooks/useToasts";
+
+const devices = [...Array(3).keys()];
 
 export const ControlTable = () => {
+  const { pushToast } = useToasts();
   // fetch data from backend every .5 seconds
   const { data: emergencyData, isLoading } = useQuery({
     queryKey: ["emergency"],
@@ -13,7 +16,7 @@ export const ControlTable = () => {
     onSuccess(data) {
       Object.entries(data).forEach(([deviceID, emergency]) => {
         if (emergency) {
-          setToastData({
+          pushToast({
             type: "warning",
             message: `Device ${deviceID} is in emergency mode`,
           });
@@ -21,10 +24,6 @@ export const ControlTable = () => {
       });
     },
   });
-
-  const { toast, setToastData } = useToast();
-
-  if (isLoading) return <p>Loading...</p>;
 
   return (
     <>
@@ -48,21 +47,18 @@ export const ControlTable = () => {
             </tr>
           </thead>
           <tbody>
-            {Object.entries(emergencyData as Record<string, boolean>).map(
-              ([key, value], i) => (
-                <ControlTableRow
-                  key={key}
-                  index={i}
-                  deviceId={key}
-                  emergency={value}
-                  nearby={false}
-                />
-              )
-            )}
+            {devices.map((deviceID, i) => (
+              <ControlTableRow
+                key={deviceID}
+                index={i}
+                deviceId={deviceID}
+                emergency={emergencyData && emergencyData[deviceID]}
+                nearby={false}
+              />
+            ))}
           </tbody>
         </table>
       </div>
-      {toast}
     </>
   );
 };

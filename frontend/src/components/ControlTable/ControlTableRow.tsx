@@ -1,14 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import clsx from "clsx";
 import BrightnessControl from "./BrightnessControl";
 import ColorControl from "./ColorControl";
 import { AiFillWarning } from "react-icons/ai";
-import { showToast, ToastData } from "../Toast";
-
+import useToasts from "../../hooks/useToasts";
 export interface ControlTableRowProps {
   index: number;
-  deviceId: string;
+  deviceId: number;
   nearby: boolean;
   emergency: boolean;
 }
@@ -19,10 +18,9 @@ export const ControlTableRow = ({
   nearby,
   emergency,
 }: ControlTableRowProps) => {
+  const { pushToast } = useToasts();
   const [color, setColor] = useState("#FFFFFF");
   const [brightness, setBrightness] = useState(0);
-  const [toastData, setToastData] = useState<ToastData | null>(null);
-  const [toastNode, setToastNode] = useState<JSX.Element>();
   const mutation = useMutation<
     unknown,
     unknown,
@@ -36,7 +34,7 @@ export const ControlTableRow = ({
       );
     },
     onSuccess: () => {
-      setToastData({
+      pushToast({
         type: "success",
         message: "Successfully updated light",
       });
@@ -53,14 +51,6 @@ export const ControlTableRow = ({
     mutation.mutate({ color, brightness });
     setBrightness(brightness);
   };
-
-  useEffect(() => {
-    if (toastData) {
-      const { toast, cleanup } = showToast(toastData);
-      setToastNode(toast);
-      return cleanup;
-    }
-  }, [toastData]);
 
   return (
     <>
@@ -91,7 +81,6 @@ export const ControlTableRow = ({
         </td>
         <td className="py-4 px-6">{nearby}</td>
       </tr>
-      {toastNode}
     </>
   );
 };
