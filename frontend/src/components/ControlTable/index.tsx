@@ -8,13 +8,15 @@ const devices = [...Array(3).keys()];
 export const ControlTable = () => {
   const { pushToast } = useToasts();
   // fetch data from backend every .5 seconds
-  const { data: emergencyData, isLoading } = useQuery({
-    queryKey: ["emergency"],
+  const { data: deviceState, isLoading } = useQuery<
+    Record<string, { emergency: boolean; proximity: boolean }>
+  >({
+    queryKey: ["deviceState"],
     queryFn: () =>
-      fetch("http://192.168.10.36:4000/getEmergency").then((res) => res.json()),
+      fetch("http://192.168.10.36:4000/getState").then((res) => res.json()),
     refetchInterval: 500,
     onSuccess(data) {
-      Object.entries(data).forEach(([deviceID, emergency]) => {
+      Object.entries(data).forEach(([deviceID, { emergency }]) => {
         if (emergency) {
           pushToast({
             type: "warning",
@@ -24,6 +26,10 @@ export const ControlTable = () => {
       });
     },
   });
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <>
@@ -52,8 +58,16 @@ export const ControlTable = () => {
                 key={deviceID}
                 index={i}
                 deviceId={deviceID}
-                emergency={emergencyData && emergencyData[deviceID]}
-                nearby={false}
+                emergency={
+                  deviceState &&
+                  deviceState[deviceID] &&
+                  deviceState[deviceID].emergency
+                }
+                nearby={
+                  deviceState &&
+                  deviceState[deviceID] &&
+                  deviceState[deviceID].proximity
+                }
               />
             ))}
           </tbody>

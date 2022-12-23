@@ -35,3 +35,14 @@ def get_emergency(cur):
         """
     )
     return cur.fetchall()
+
+def get_proximity(cur):
+    # select the latest proximity for each device
+    cur.execute(
+        """
+        SELECT deviceid, value, timestamp FROM proximity WHERE timestamp = (
+            SELECT MAX(timestamp) FROM proximity WHERE deviceid = proximity.deviceid
+        );
+        """
+    )
+    return cur.fetchall()

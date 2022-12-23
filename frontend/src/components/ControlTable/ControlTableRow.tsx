@@ -8,8 +8,8 @@ import useToasts from "../../hooks/useToasts";
 export interface ControlTableRowProps {
   index: number;
   deviceId: number;
-  nearby: boolean;
-  emergency: boolean;
+  nearby?: boolean;
+  emergency?: boolean;
 }
 
 export const ControlTableRow = ({

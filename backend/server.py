@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from mqtt import publish
-from db import connect_to_db, get_emergency
+from db import connect_to_db, get_emergency, get_proximity
 from env import env
 
 app = Flask(__name__)
@@ -9,6 +9,7 @@ CORS(app)
 
 
 last_emergency = {}
+last_proximity = {}
 
 @app.route("/turnOn", methods=["GET"])
 def turnOn():
@@ -84,3 +85,48 @@ def getEmergency():
     
     # convert emergency to json and return
     return jsonify(emergency)
+
+@app.route("/getState", methods=["GET"])
+def getState():
+    conn = connect_to_db()
+    cur = conn.cursor()
+    emergency = get_emergency(cur)
+    proximity = get_proximity(cur)
+    cur.close()
+    conn.close()
+    # return an object with deviceID as key and emergency as value
+    emergency = {x[0]: x[1] for x in emergency}
+    proximity = {x[0]: x[1] for x in proximity}
+
+    currentEmergency = emergency.copy()
+    currentProximity = proximity.copy()
+
+    # compare to last emergency
+    global last_emergency
+    global last_proximity
+
+    # remove all devices that did not change
+    for deviceID in last_emergency:
+        if deviceID in emergency:
+            if emergency[deviceID] == last_emergency[deviceID]:
+                del emergency[deviceID]
+        if deviceID in proximity:
+            if proximity[deviceID] == last_proximity[deviceID]:
+                del proximity[deviceID]
+
+    # update last emergency
+    last_emergency = currentEmergency
+    last_proximity = currentProximity
+
+    # merge emergency and proximity
+    data = {}
+
+    for deviceID in emergency:
+        data[deviceID] = {"emergency": emergency[deviceID], "proximity": 0}
+    for deviceID in proximity:
+        if deviceID in data:
+            data[deviceID]["proximity"] = proximity[deviceID]
+        else:
+            data[deviceID] = {"emergency": 0, "proximity": proximity[deviceID]}
+
+    return jsonify(data)
