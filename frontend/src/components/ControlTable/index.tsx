@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import ControlTableRow from "./ControlTableRow";
 import useToasts from "../../hooks/useToasts";
@@ -7,6 +7,13 @@ const devices = [...Array(3).keys()];
 
 export const ControlTable = () => {
   const { pushToast } = useToasts();
+  const [prevDeviceState, setPrevDeviceState] = useState<
+    Record<string, { emergency: boolean; proximity: boolean }>
+  >({
+    "0": { emergency: false, proximity: false },
+    "1": { emergency: false, proximity: false },
+    "2": { emergency: false, proximity: false },
+  });
   // fetch data from backend every .5 seconds
   const { data: deviceState, isLoading } = useQuery<
     Record<string, { emergency: boolean; proximity: boolean }>
@@ -18,14 +25,22 @@ export const ControlTable = () => {
       ),
     refetchInterval: 500,
     onSuccess(data) {
-      Object.entries(data).forEach(([deviceID, { emergency }]) => {
-        if (emergency) {
+      // compare with previous state
+      // if there is a change, push a toast
+      Object.keys(data).forEach((deviceID) => {
+        if (
+          prevDeviceState[deviceID] &&
+          prevDeviceState[deviceID].emergency !== data[deviceID].emergency &&
+          data[deviceID].emergency
+        ) {
           pushToast({
-            type: "warning",
             message: `Device ${deviceID} is in emergency mode`,
+            type: "warning",
           });
         }
       });
+
+      setPrevDeviceState(data);
     },
   });
 
