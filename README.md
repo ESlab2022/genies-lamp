@@ -53,9 +53,23 @@ docker compose up -d --build
 
 ## Demo videos
 
+
+
+https://user-images.githubusercontent.com/55420821/209436531-7b835418-ea20-4811-a5da-27b588f9689f.mp4
+
+
+https://user-images.githubusercontent.com/55420821/209436524-54da717d-f55a-455d-bae4-5ac3371e20f8.mp4
+
+
+https://user-images.githubusercontent.com/55420821/209436498-577ec972-1a37-4c13-8246-f392bc78cfd4.mp4
+
 ## MQTT topic naming regulation
 
 ```
+
+
+
+
 /lamp{deviceID}/temperature:	float
 /lamp{deviceID}/humidity:		float
 /lamp{deviceID}/pressure:		float
