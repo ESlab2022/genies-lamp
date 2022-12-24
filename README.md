@@ -28,7 +28,7 @@ pip3 install -r utils/requirements.txt
 cp .env.default .env
 ```
 
-Please modify .env to according to the comment insied.
+Please modify .env to according to the comment inside.
 
 ### Server Side
 
@@ -53,8 +53,6 @@ docker compose up -d --build
 
 ## Demo videos
 
-
-
 https://user-images.githubusercontent.com/55420821/209436531-7b835418-ea20-4811-a5da-27b588f9689f.mp4
 
 
@@ -66,14 +64,11 @@ https://user-images.githubusercontent.com/55420821/209436498-577ec972-1a37-4c13-
 ## MQTT topic naming regulation
 
 ```
+/lamp{deviceID}/temperature: float
+/lamp{deviceID}/humidity: float
+/lamp{deviceID}/pressure: float
+/lamp{deviceID}/emergency: bool 0, 1
+/lamp{deviceID}/proximity: bool 0, 1
 
-
-
-
-/lamp{deviceID}/temperature:	float
-/lamp{deviceID}/humidity:		float
-/lamp{deviceID}/pressure:		float
-/lamp{deviceID}/emergency:	bool 0, 1
-
-/lamp{deviceID}/brightness:	int 0 - 100
+/lamp{deviceID}/brightness: three int 0 - 100 seperate by comma
 ```
