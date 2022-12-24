@@ -1,5 +1,11 @@
 # genies-lamp
 
+## Docs
+
+- The final report of this project can be seen in [doc/report.pdf](https://github.com/ESlab2022/genies-lamp/blob/main/doc/report.pdf).
+- The proposal slide is in [doc/report.pdf](https://github.com/ESlab2022/genies-lamp/blob/main/doc/proposal.pdf).
+- The demo slide is in [doc/report.pdf](https://github.com/ESlab2022/genies-lamp/blob/main/doc/demo.pdf).
+
 ## Presquique
 
 ### Hardware
